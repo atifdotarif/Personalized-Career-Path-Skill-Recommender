@@ -7,7 +7,7 @@
 **Course**: Recommender Systems — Spring 2026
 **Institute**: National University of Computer and Emerging Sciences, Karachi
 **Instructor**: Syed Zain Ul Hassan
-**Team**: Atif Arif (22K-4358), Unzila Javed (22K-4168), Mishkaat Yousuf (22K-4624), Rao Abdul Hassi (22K-4202)
+**Team**: Atif Arif (22K-4358), Unzila Javed (22K-4168), Mishkaat Yousuf (22K-4624), Rao Abdul Hadi (22K-4202)
 
 ---
 
