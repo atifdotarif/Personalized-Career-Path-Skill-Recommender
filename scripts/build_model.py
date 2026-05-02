@@ -34,6 +34,7 @@ def main() -> None:
     t0 = time.time()
     rec = CareerRecommender.build(force_rebuild_data=True)
     rec.save()
+    rec.save_slim()  # ~15 MB deployment bundle, safe to commit
     print(f"\nBuild complete in {time.time() - t0:.1f}s")
     print(f"  Roles indexed:    {len(rec.roles)}")
     print(f"  Postings indexed: {len(rec.postings):,}")

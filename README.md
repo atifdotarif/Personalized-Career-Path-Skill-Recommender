@@ -97,6 +97,27 @@ python -m venv .venv
 
 The first run preprocesses the full 123k-row corpus (~5 minutes); after that, the cached parquet + pickled model load in seconds.
 
+## Deploying to Streamlit Cloud
+
+The raw 516 MB Kaggle CSV is too large to push to GitHub, so the cloud deployment runs off a pre-built **slim bundle** (`data/processed/recommender_slim.pkl`, ~15 MB) that contains the role index, TF-IDF model, and both NetworkX graphs but drops the raw posting descriptions (which are not needed at inference time).
+
+To deploy:
+
+1. Build the bundle locally **once**:
+   ```bash
+   .venv/Scripts/python.exe scripts/build_model.py
+   ```
+   This writes `data/processed/recommender.pkl` (full, gitignored) and `data/processed/recommender_slim.pkl` (slim, **committed**).
+2. Commit the slim bundle:
+   ```bash
+   git add data/processed/recommender_slim.pkl
+   git commit -m "chore: refresh deployment bundle"
+   git push
+   ```
+3. On Streamlit Cloud, point the app at `app/streamlit_app.py`. The loader (`CareerRecommender.load_or_build`) checks for the full pickle first, falls back to the slim pickle, and only as a last resort tries to rebuild from the raw CSV — so cloud will pick up the slim file automatically.
+
+If you change the skill vocabulary or any preprocessing step, re-run the build script and re-commit the slim bundle.
+
 ## Run the EDA notebook
 
 ```bash

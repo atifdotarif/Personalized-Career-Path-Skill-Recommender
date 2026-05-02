@@ -1,9 +1,12 @@
 # Data
 data/raw/
-data/processed/
 postings.csv/
-*.parquet
-*.pkl
+
+# Inside data/processed/, ignore everything except the slim deployment bundle.
+# The slim bundle (~15 MB) is committed so Streamlit Cloud can boot without
+# the raw CSV. The full pickle (236 MB) and the parquet cache stay local.
+data/processed/*
+!data/processed/recommender_slim.pkl
 
 # Python
 __pycache__/

@@ -89,7 +89,7 @@ with st.sidebar:
 
     st.divider()
     st.metric("Roles indexed", len(rec.roles))
-    st.metric("Postings indexed", f"{len(rec.postings):,}")
+    st.metric("Postings indexed", f"{rec.n_postings_total:,}")
     st.metric("Skill vocabulary", rec.tfidf.vocabulary_size())
 
 # Combine free text + picked into one effective skill set.

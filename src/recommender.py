@@ -30,6 +30,7 @@ from .tfidf_model import RoleTFIDFModel
 logger = logging.getLogger(__name__)
 
 DEFAULT_MODEL_PATH = Path("data/processed/recommender.pkl")
+DEFAULT_SLIM_MODEL_PATH = Path("data/processed/recommender_slim.pkl")
 
 
 @dataclass
@@ -59,17 +60,26 @@ class Recommendation:
 class CareerRecommender:
     def __init__(
         self,
-        postings: pd.DataFrame,
+        postings: pd.DataFrame | None,
         roles: pd.DataFrame,
         tfidf: RoleTFIDFModel,
         skill_graph: nx.Graph,
         role_graph: nx.DiGraph,
+        n_postings_total: int | None = None,
     ) -> None:
+        # `postings` is optional: not needed for inference, only for rebuilding.
+        # The slim deployment bundle drops it to stay under the GitHub 100 MB
+        # file size limit.
         self.postings = postings
         self.roles = roles
         self.tfidf = tfidf
         self.skill_graph = skill_graph
         self.role_graph = role_graph
+        self.n_postings_total = (
+            n_postings_total
+            if n_postings_total is not None
+            else (len(postings) if postings is not None else 0)
+        )
 
     # ------------------------------------------------------------------ build
     @classmethod
@@ -89,6 +99,29 @@ class CareerRecommender:
             pickle.dump(self, f)
         logger.info("Saved recommender bundle to %s", path)
 
+    def save_slim(self, path: Path | str = DEFAULT_SLIM_MODEL_PATH) -> None:
+        """Pickle the inference-only fields — drops the postings DataFrame
+        (the bulk of the bundle) so the result is small enough to commit and
+        deploy to Streamlit Cloud."""
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # Defensive: support unpickling from older bundles where
+        # n_postings_total wasn't an attribute.
+        n_total = getattr(self, "n_postings_total", None)
+        if not n_total and self.postings is not None:
+            n_total = len(self.postings)
+        slim = CareerRecommender(
+            postings=None,
+            roles=self.roles,
+            tfidf=self.tfidf,
+            skill_graph=self.skill_graph,
+            role_graph=self.role_graph,
+            n_postings_total=int(n_total or 0),
+        )
+        with open(path, "wb") as f:
+            pickle.dump(slim, f)
+        logger.info("Saved slim recommender bundle to %s (size: %.1f MB)", path, path.stat().st_size / 1e6)
+
     @classmethod
     def load(cls, path: Path | str = DEFAULT_MODEL_PATH) -> "CareerRecommender":
         with open(path, "rb") as f:
@@ -96,10 +129,16 @@ class CareerRecommender:
 
     @classmethod
     def load_or_build(cls, path: Path | str = DEFAULT_MODEL_PATH) -> "CareerRecommender":
+        """Load the bundle at `path`. If absent, fall back to the slim bundle
+        next to it. If both are absent, build from raw data."""
         path = Path(path)
         if path.exists():
             logger.info("Loading recommender bundle from %s", path)
             return cls.load(path)
+        slim_path = path.with_name("recommender_slim.pkl")
+        if slim_path.exists():
+            logger.info("Loading slim recommender bundle from %s", slim_path)
+            return cls.load(slim_path)
         rec = cls.build()
         rec.save(path)
         return rec
