@@ -8,3 +8,4 @@ pyarrow>=15.0
 matplotlib>=3.8
 jupyter>=1.0
 pytest>=8.0
+xhtml2pdf>=0.2.16

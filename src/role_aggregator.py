@@ -25,6 +25,27 @@ logger = logging.getLogger(__name__)
 
 MIN_POSTINGS_PER_ROLE = 5  # roles backed by fewer postings are too noisy
 
+# LinkedIn job URLs are deterministic from job_id, so we don't need to store
+# the URL field — we synthesize on demand to keep the slim bundle small.
+LINKEDIN_JOB_URL = "https://www.linkedin.com/jobs/view/{job_id}/"
+
+
+def _sample_postings(group: pd.DataFrame, k: int = 5) -> list[dict]:
+    """Pick k representative postings for a role and return UI-ready dicts."""
+    # Prefer postings with the most extracted skills — they're typically the
+    # most informative example of what the role looks like.
+    head = group.sort_values("skill_count", ascending=False).head(k)
+    samples: list[dict] = []
+    for _, r in head.iterrows():
+        samples.append({
+            "job_id": int(r["job_id"]),
+            "title": r["title"],
+            "company": r.get("company_name") if pd.notna(r.get("company_name")) else "",
+            "location": r.get("location") if pd.notna(r.get("location")) else "",
+            "url": LINKEDIN_JOB_URL.format(job_id=int(r["job_id"])),
+        })
+    return samples
+
 
 def aggregate_roles(postings: pd.DataFrame) -> pd.DataFrame:
     """Build a role-level dataframe from preprocessed postings."""
@@ -60,7 +81,7 @@ def aggregate_roles(postings: pd.DataFrame) -> pd.DataFrame:
                     group["formatted_experience_level"].dropna().value_counts()
                 ),
                 "work_types": dict(group["formatted_work_type"].dropna().value_counts()),
-                "sample_job_ids": group["job_id"].head(5).tolist(),
+                "samples": _sample_postings(group, k=5),
             }
         )
 

@@ -140,6 +140,16 @@ for r in recommendations:
         if r.top_companies:
             st.caption(f"Top hiring companies: {r.top_companies}")
 
+        if r.samples:
+            with st.expander(f"View {len(r.samples)} sample LinkedIn postings for this role"):
+                for s in r.samples:
+                    company = s.get("company") or "—"
+                    loc = s.get("location") or ""
+                    loc_str = f" · {loc}" if loc else ""
+                    st.markdown(
+                        f"- [{s['title']}]({s['url']}) — *{company}*{loc_str}",
+                    )
+
 # ---------------------------------------------------------------- bridge path
 st.subheader("Bridge path: how to get to a target role")
 st.write(

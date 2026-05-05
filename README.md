@@ -139,6 +139,35 @@ for r in recs:
 path = rec.bridge_path(parsed, target_role_id="machine learning engineer")
 ```
 
+## Course deliverables
+
+| Deliverable | Location |
+|---|---|
+| Working recommendation system (UI + library) | `app/streamlit_app.py`, `src/`, deployed on Streamlit Cloud |
+| Project report (3 pages) | [`docs/REPORT.md`](docs/REPORT.md) (source) · [`docs/REPORT.pdf`](docs/REPORT.pdf) (PDF) |
+| Quantitative evaluation script | [`scripts/evaluate.py`](scripts/evaluate.py) → [`docs/evaluation_metrics.json`](docs/evaluation_metrics.json) |
+| EDA + methodology + evaluation notebooks | [`notebooks/01_eda.ipynb`](notebooks/01_eda.ipynb), [`notebooks/02_modeling.ipynb`](notebooks/02_modeling.ipynb), [`notebooks/03_evaluation.ipynb`](notebooks/03_evaluation.ipynb) |
+| Unit tests | `tests/` (run `pytest`) |
+
+To regenerate the report PDF after editing `docs/REPORT.md`:
+
+```bash
+.venv/Scripts/python.exe scripts/build_report.py
+```
+
+## Headline evaluation numbers
+
+Reproducible from `scripts/evaluate.py` (seed = 42). Full analysis in [`docs/REPORT.md`](docs/REPORT.md).
+
+| Metric | Value | vs. random |
+|---|---|---|
+| Self-recommendation P@1 | 26.6% | 282× |
+| Self-recommendation P@10 | 50.0% | 53× |
+| Next-skill prediction hits@5 | 42.9% | 10× |
+| Coverage of role index | 69.8% (740 / 1,060) | — |
+| Mean intra-list diversity | 0.78 (Jaccard distance) | — |
+| Latency (p99) | 4.0 ms | — |
+
 ## Notes on data quality
 
 - Only ~2% of LinkedIn postings populate the structured `skills_desc` column. We extract skills from `description` (free text) using a curated vocabulary of ~110 technical skills with alias resolution. Extending `src/skills_vocab.py` is the cleanest way to broaden coverage.

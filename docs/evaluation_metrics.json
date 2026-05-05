@@ -1,0 +1,36 @@
+{
+  "self_recommendation": {
+    "n": 522,
+    "precision_at_1": 0.2662835249042146,
+    "precision_at_5": 0.4118773946360153,
+    "precision_at_10": 0.5
+  },
+  "skill_extractor_agreement": {
+    "n_evaluated": 193,
+    "n_with_overlap": 97,
+    "mean_precision": 0.3160318955655743,
+    "mean_recall": 0.4099499809344369,
+    "mean_jaccard": 0.2645409553364445,
+    "f1": 0.35691598855437584
+  },
+  "next_skill_prediction": {
+    "n_evaluated": 1000,
+    "next_skill_at_3": 0.343,
+    "next_skill_at_5": 0.429,
+    "next_skill_at_10": 0.556
+  },
+  "coverage_and_diversity": {
+    "n_profiles": 500,
+    "coverage": 0.6981132075471698,
+    "unique_roles_seen": 740,
+    "total_roles": 1060,
+    "mean_diversity": 0.7839049404178584
+  },
+  "latency": {
+    "n_calls": 200,
+    "mean_ms": 3.210516000001462,
+    "p50_ms": 3.1698999998752697,
+    "p95_ms": 3.739705000066351,
+    "p99_ms": 3.9945760001000927
+  }
+}

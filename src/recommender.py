@@ -42,7 +42,7 @@ class Recommendation:
     median_salary: float
     top_companies: str
     gap: SkillGap
-    sample_job_ids: list[Any] = field(default_factory=list)
+    samples: list[dict] = field(default_factory=list)  # job_id, title, company, location, url
 
     def to_dict(self) -> dict:
         return {
@@ -53,7 +53,7 @@ class Recommendation:
             "median_salary": self.median_salary,
             "top_companies": self.top_companies,
             "gap": self.gap.to_dict(),
-            "sample_job_ids": self.sample_job_ids,
+            "samples": self.samples,
         }
 
 
@@ -168,7 +168,7 @@ class CareerRecommender:
                     median_salary=float(row["median_salary"]) if pd.notna(row["median_salary"]) else float("nan"),
                     top_companies=row["top_companies"],
                     gap=gap,
-                    sample_job_ids=row["sample_job_ids"],
+                    samples=list(row["samples"]) if "samples" in row.index else [],
                 )
             )
         return user_skills, recommendations
