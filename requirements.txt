@@ -1,3 +1,8 @@
+# Runtime dependencies for the deployed Streamlit app.
+# Keep this minimal — Streamlit Cloud installs every line, and any package
+# requiring native libs (e.g. cairo, GTK) will fail in the sandbox.
+# Local-only / build-time deps live in requirements-dev.txt.
+
 pandas>=2.1
 numpy>=1.26
 scikit-learn>=1.4
@@ -5,7 +10,3 @@ networkx>=3.2
 streamlit>=1.32
 plotly>=5.20
 pyarrow>=15.0
-matplotlib>=3.8
-jupyter>=1.0
-pytest>=8.0
-xhtml2pdf>=0.2.16
